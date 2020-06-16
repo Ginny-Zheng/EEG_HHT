@@ -227,9 +227,7 @@ wave_amp[[2]][22,5:8]
 wave_amp[[3]][22,5:8]
 
 
-
-
-###### histogram for channel 22, all epochs
+## histogram for channel 22, all epochs
 temp <- unlist(lapply(wave_amp, FUN = function(x) x[22,6]))
 temp[is.na(temp)] <- 0
 temp_data <- data.frame(value = temp, 
@@ -261,7 +259,8 @@ p
 
 
 
-######### t.test for all channels for task 3
+## t.test for all channels during task 3
+load("amp_server_result/p18c3_amplitude_server.RData")
 eyeopen <- seq(1,length(wave_amp), by = 2)
 eyeclose <- seq(2,length(wave_amp), by = 2)
 pvalue <- matrix(0, 64, 16)
@@ -273,17 +272,40 @@ for(j in 1:64)
                           alternative = 'less')$p.value
   }
 }
-heatmap.2(pvalue[, c(1,6,11,16)], trace = 'none', keysize = 1, cexCol = 1.5,
-          Colv = NA, labCol = c("IMF1", "IMF2", "IMF3", "IMF4"), dendrogram = "row",
-          density.info = 'density')
+heatmap.2(pvalue, trace = 'none', keysize = 1, cexCol = 1.5)
+pvalue_01 <- matrix(as.numeric(pvalue<0.05), 64, 16)
+heatmap.2(pvalue_01, trace = 'none', keysize = 1, cexCol = 1.5, cexRow = 1.2)
 
-pvalue_01 <- matrix(as.numeric(pvalue<0.01), 64, 16)
+p_test <- pvalue[, 6]
+plot(p.adjust(p_test, method = "bonferroni"))
+abline(h=0.05)
+plot(p.adjust(p_test, method = "fdr"))
+abline(h=0.05)
+round(p.adjust(p_test, method = "fdr"), 3)
 
-par(mar=c(3,2,0,0))
-heatmap.2(pvalue_01[, c(1,6,11,16)], trace = 'none', Colv = NA, dendrogram = "row",
-          key = FALSE, cexCol = 1.5, cexRow = 1.2, 
-          labCol = c("IMF1", "IMF2", "IMF3", "IMF4"))
 
-setdiff(1:64, which(pvalue_01[,6]==1))
-which(pvalue_01[,6]==1)
+## t.test for all channels during task 4
+load("amp_server_result/p18c4_amplitude_server.RData")
+eyeopen <- seq(1,length(wave_amp), by = 2)
+eyeclose <- seq(2,length(wave_amp), by = 2)
+pvalue <- matrix(0, 64, 16)
+for(j in 1:64)
+{
+  for (i in 1:16) {
+    temp <- unlist(lapply(wave_amp, FUN = function(x) x[j,i]))
+    pvalue[j,i] <- t.test(temp[eyeopen], temp[eyeclose],
+                          alternative = 'less')$p.value
+  }
+}
+heatmap.2(pvalue, trace = 'none', keysize = 1, cexCol = 1.5)
+pvalue_01 <- matrix(as.numeric(pvalue<0.05), 64, 16)
+heatmap.2(pvalue_01, trace = 'none', keysize = 1, cexCol = 1.5, cexRow = 1.2)
+
+p_test <- pvalue[, 6]
+plot(p.adjust(p_test, method = "bonferroni"))
+abline(h=0.05)
+plot(p.adjust(p_test, method = "fdr"))
+abline(h=0.05)
+round(p.adjust(p_test, method = "fdr"), 3)
+
 
