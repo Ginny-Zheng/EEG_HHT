@@ -1,19 +1,12 @@
 #' This code draws some figures in the paper
-#'
-#' This code allows you to obtain feature importance and compute classification accuracy.
-#' @param feature_data the structured data.
-#' @param event_label event label of each epoch: tasks number for between-tasks classifiers and movement label for within-task classifiers.
-#' @param testnum number of epochs used as testing sets.
-#' @keywords Feature importance and Classifier
-#' @import ranger
-#' @examples
 
 library(ggplot2)
 library(plyr)
 library(hrbrthemes)
 library(gplots)
 
-## p9c1
+## Plot Hilbert spectrum of each IMF
+# p9c1
 event <- data[, (event_label[2]:event_label[3])]
 time <- 1:dim(event)[2]
 plot(time, event[1,], 'l')
@@ -151,38 +144,6 @@ p <- temp_data %>%
     axis.text.y = element_text(size = rel(2), margin = margin(0,5,0,0))
   )
 p
-
-
-## histogram for channel 22, all epochs
-temp <- unlist(lapply(wave_amp, FUN = function(x) x[22,6]))
-temp[is.na(temp)] <- 0
-temp_data <- data.frame(value = temp, 
-                        type = c(rep(c("eyes open", "eyes closed"), 21)))
-temp_data <- temp_data[temp_data$value > 0, ]
-
-library(plyr)
-mu <- ddply(temp_data, "type", summarise, grp.mean=mean(value))
-head(mu)
-
-library(hrbrthemes)
-p <- temp_data %>%
-  ggplot( aes(x=value, fill=type)) +
-  geom_histogram(aes(y=..density..), binwidth = 0.3,
-                 color="#e9ecef", alpha=0.7, position = 'identity') +
-  scale_fill_manual(values=c("#69b3a2", "#404080")) +
-  theme_ipsum() +
-  labs(fill="") + geom_density(alpha = 0.4) +
-  geom_vline(data=mu, aes(xintercept=grp.mean, color=type),
-             linetype="dashed", lwd=2)+
-  labs(x = "Amplitude Value", y = "Density")+
-  theme(
-    axis.title.x = element_text(color="black", size=15, face="bold"),
-    axis.title.y = element_text(color="black", size=15, face="bold"),
-    axis.text.x = element_text(size = rel(2), margin = margin(5,0,0,0)),
-    axis.text.y = element_text(size = rel(2), margin = margin(0,5,0,0))
-  )
-p
-
 
 
 ## t.test for all channels during task 3
