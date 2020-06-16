@@ -1,22 +1,31 @@
-a <- try$hinstfreq[,2]
-a <- a[which(a<42)]
-plot(a)
-hist(a)
-quantile(a, probs = seq(0,1,0.1))
-length(which(a>=8 & a<=14))/length(a)
+#' This code draws the distribution of the instantaneous frequency (IFs)
+library(tidyverse)
+library(hrbrthemes)
 
-dat <- data.frame(label = 1:15000,
+# p9c1
+event <- data[, (event_label[2]:event_label[3])]
+time <- 1:dim(event)[2]
+plot(time, event[1,], 'l')
+plot(1:dim(data)[2], data[2, ], 'l')
+dt <- 1/500
+
+## EMD
+i <- 40
+try <- Sig2IMF(event[i, ], time*dt)
+par(mar=c(3,2,0.1,0.1), mgp=c(1,1,0))
+PlotIMFs(try, cex = 1.2, imf.list = 1:6)
+
+dat <- data.frame(label = 1:dim(try$hinstfreq)[1],
                   IMF1 = try$hinstfreq[, 1], 
                   IMF2 = try$hinstfreq[, 2],
                   IMF3 = try$hinstfreq[, 3],
                   IMF4 = try$hinstfreq[, 4])
 
-library(tidyverse)
 new_dat <- gather(dat, key = "label", value = "measurement", "IMF1":"IMF4")
 new_dat <- new_dat[which(new_dat$measurement < 35), ]
-library(hrbrthemes)
 
-  ggplot(new_dat, aes(x=measurement, fill=label)) +
+## plot the distribution of IFs for the first four IMFs
+ggplot(new_dat, aes(x=measurement, fill=label)) +
   geom_histogram(aes(y=..density..), color="#e9ecef", alpha=0.6, position = 'identity', bins = 50) +
   geom_density(alpha=.2, color="#bdc6cf") +
   theme_minimal() + xlab("Frequency") + ylab("Density") +
