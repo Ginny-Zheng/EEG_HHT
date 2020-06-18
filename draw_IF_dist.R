@@ -1,7 +1,7 @@
 #' This code draws the distribution of the instantaneous frequency (IFs)
 library(tidyverse)
 library(hrbrthemes)
-
+library(hht)
 # p9c1
 event <- data[, (event_label[2]:event_label[3])]
 time <- 1:dim(event)[2]
